@@ -27,3 +27,4 @@ print(signin_signup_message.text)  # контрольний вивід
 assert signin_signup_message.text == 'Вхід / реєстрація', 'FAILED! Something wrong!'
 time.sleep(slp)
 driver.quit()
+
