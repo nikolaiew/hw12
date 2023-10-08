@@ -1,24 +1,29 @@
 import time
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 driver = webdriver.Chrome()
-driver.implicitly_wait(2)  # неявне очікування
-driver.get("https://casenik.com.ua/user/login")
+driver.implicitly_wait(2)  # задаємо неявне очікування
+driver.get("https://www.ctrs.com.ua/")
 
-email_field = driver.find_element(By.XPATH, '//input[@id="email"]')
-email_field.send_keys("liam_brown9793@gmail.com")
-password_field = driver.find_element(By.XPATH, '//input[@id="pasword"]')
-password_field.send_keys("Password2023")
-login_button = driver.find_element(By.XPATH, '//button[@class="btn button-gen"]').click()
+slp = 2  # змінна тривалості примусової затримки для зручності спостереження за тестом
 
-message2 = WebDriverWait(driver, 29).until_not(
-    #EC.element_to_be_clickable((By.XPATH, "//div[@class = 'alert alert-success']"))
-    EC.visibility_of_element_located((By.XPATH, "//div[@class = 'alert alert-success']"))
-)  # реалізовано явне очікування, а саме: очікуй зникнення елементу, але не більше 29 сек. (якщо збільшити до 32 сек. і більше - код запрацює)
+# Очікуємо кнопку зворотнього зв'язку (але не більше 10 сек), яка з'являється з затримкою
+feedback_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//div[@class="dib"]/button'))).click()
+time.sleep(slp)
 
-time.sleep(5)
+# Обираємо варіант "Написати до служби підтримки" - відкривається нове вікно
+write_to_support = driver.find_element(By.XPATH, '//a[@href="https://my.ctrs.com.ua/uk/support/tickets"]').click()
+time.sleep(slp)
 
+# переходимо у відповідне нове вікно та обираємо контрольний напис
+write_to_support_page = driver.window_handles[1]
+driver.switch_to.window(write_to_support_page)
+signin_signup_message = driver.find_element(By.XPATH, '//h2')
+print(signin_signup_message.text)  # контрольний вивід
+
+# перевірка відповідності отриманого напису з очікуємим
+assert signin_signup_message.text == 'Вхід / реєстрація', 'FAILED! Something wrong!'
+time.sleep(slp)
 driver.quit()
